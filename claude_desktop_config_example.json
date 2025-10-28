@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "construction-estimator": {
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "/Users/austin/Desktop/Projects/mcp-estimates/src/ConstructionEstimation.McpServer"
+      ]
+    }
+  }
+}
