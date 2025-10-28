@@ -58,11 +58,21 @@ dotnet restore
 
 3. Run the application:
 
+**For HTTPS (recommended):**
+
 ```bash
-dotnet run --project src/ConstructionEstimation.Api
+dotnet run --project src/ConstructionEstimation.Api --launch-profile https
 ```
 
 The API will start on `https://localhost:7052` (HTTPS) and `http://localhost:5125` (HTTP).
+
+**For HTTP only:**
+
+```bash
+dotnet run --project src/ConstructionEstimation.Api --launch-profile http
+```
+
+The API will start on `http://localhost:5125` (HTTP only).
 
 4. Open your browser and navigate to:
 
