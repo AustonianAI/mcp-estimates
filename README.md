@@ -7,9 +7,11 @@ A RESTful API backend for construction estimation management built with .NET Cor
 - **Client Management** - Create and manage client information
 - **Estimate Management** - Generate and track construction estimates with status tracking
 - **Invoice Management** - Create invoices linked to estimates or standalone
+- **MCP Server** - AI integration via Model Context Protocol for natural language interactions
 - **SQLite Database** - Lightweight, file-based database for easy setup
 - **Swagger UI** - Interactive API documentation and testing interface
 - **RESTful Design** - Clean, intuitive API endpoints
+- **Sample Data** - Automatically seeded demo data for testing
 
 ## Technology Stack
 
@@ -30,8 +32,12 @@ ConstructionEstimation/
 │   │   └── appsettings.json                 # Configuration
 │   ├── ConstructionEstimation.Core/         # Domain models
 │   │   └── Models/                          # Client, Estimate, Invoice
-│   └── ConstructionEstimation.Data/         # Data access layer
-│       └── AppDbContext.cs                  # EF Core context
+│   ├── ConstructionEstimation.Data/         # Data access layer
+│   │   ├── AppDbContext.cs                  # EF Core context
+│   │   └── DbSeeder.cs                      # Sample data seeder
+│   └── ConstructionEstimation.McpServer/    # MCP server for AI integration
+│       ├── Tools/                           # MCP tool implementations
+│       └── Program.cs                       # MCP server entry point
 └── ConstructionEstimation.sln               # Solution file
 ```
 
@@ -260,6 +266,124 @@ Configuration is managed through `appsettings.json`:
 ## License
 
 This is a demo project created for demonstration purposes.
+
+## MCP Server (AI Integration)
+
+This project includes a **Model Context Protocol (MCP) server** that enables AI assistants like Claude to interact with your construction estimation data.
+
+### What is MCP?
+
+Model Context Protocol (MCP) is a standard protocol that allows AI assistants to securely connect to your data and tools. With the MCP server, you can use natural language to:
+
+- Query client information
+- Create and manage estimates
+- View financial summaries
+- Get statistics about your projects
+
+### MCP Server Setup
+
+#### Prerequisites
+
+- [Claude Desktop](https://claude.ai/download) installed
+- .NET 9.0 SDK
+
+#### Configure Claude Desktop
+
+1. Open your Claude Desktop configuration file:
+
+**macOS:**
+
+```bash
+code ~/Library/Application\ Support/Claude/claude_desktop_config.json
+```
+
+**Windows:**
+
+```bash
+code %APPDATA%\Claude\claude_desktop_config.json
+```
+
+2. Add the construction estimator MCP server:
+
+```json
+{
+  "mcpServers": {
+    "construction-estimator": {
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "/ABSOLUTE/PATH/TO/mcp-estimates/src/ConstructionEstimation.McpServer"
+      ]
+    }
+  }
+}
+```
+
+**Important:** Replace `/ABSOLUTE/PATH/TO/mcp-estimates` with the actual absolute path to your project directory.
+
+3. Restart Claude Desktop completely (Quit and reopen, don't just close the window)
+
+4. Look for the 🔨 (hammer) icon in Claude Desktop to see available tools
+
+### Available MCP Tools
+
+The MCP server exposes 8 tools for AI interaction:
+
+#### Client Management
+
+- **list_clients** - Get all clients with basic information
+- **get_client_details** - Get detailed client info including estimates and invoices
+
+#### Estimate Management
+
+- **list_estimates** - Get all estimates with optional client filter
+- **get_estimate_details** - Get detailed estimate information
+- **create_estimate** - Create a new estimate for a client
+- **get_estimate_statistics** - Get statistics about estimates
+
+#### Invoice & Financial
+
+- **list_invoices** - Get all invoices with optional filters
+- **get_client_financial_summary** - Get comprehensive financial summary
+
+### Example AI Queries
+
+Once configured, you can ask Claude questions like:
+
+- "Show me all clients in the system"
+- "What's the financial summary for Smith Residence?"
+- "Create an estimate for Martinez Family Home for a deck renovation worth $15,000"
+- "What are the statistics on all my estimates?"
+- "Show me all unpaid invoices"
+
+### Running the MCP Server Standalone
+
+You can also test the MCP server directly:
+
+```bash
+cd src/ConstructionEstimation.McpServer
+dotnet run
+```
+
+The server listens on stdin for JSON-RPC messages and responds on stdout.
+
+### Troubleshooting MCP Server
+
+**Server not appearing in Claude Desktop:**
+
+1. Verify the path in `claude_desktop_config.json` is absolute and correct
+2. Check Claude Desktop logs:
+   ```bash
+   tail -f ~/Library/Logs/Claude/mcp*.log
+   ```
+3. Make sure you fully quit and restart Claude Desktop
+
+**Tool calls failing:**
+
+- Check the MCP server logs in Claude's log directory
+- Verify the database file exists and is accessible
+- Ensure .NET 9.0 is installed: `dotnet --version`
 
 ## Contributing
 
