@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace ConstructionEstimation.Core.Models;
 
 public class Estimate
@@ -14,7 +16,9 @@ public class Estimate
     public DateTime UpdatedAt { get; set; }
 
     // Navigation properties
+    [JsonIgnore]
     public Client Client { get; set; } = null!;
+    [JsonIgnore]
     public ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
 }
 

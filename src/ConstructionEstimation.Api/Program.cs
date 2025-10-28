@@ -4,7 +4,11 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 
 // Configure SQLite database
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
@@ -37,11 +41,12 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Ensure database is created and apply migrations
+// Ensure database is created and seed with sample data
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     dbContext.Database.EnsureCreated();
+    DbSeeder.SeedData(dbContext);
 }
 
 // Configure the HTTP request pipeline

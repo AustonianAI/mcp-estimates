@@ -24,10 +24,7 @@ public class InvoicesController : ControllerBase
         [FromQuery] Guid? clientId,
         [FromQuery] Guid? estimateId)
     {
-        var query = _context.Invoices
-            .Include(i => i.Client)
-            .Include(i => i.Estimate)
-            .AsQueryable();
+        var query = _context.Invoices.AsQueryable();
 
         if (clientId.HasValue)
         {

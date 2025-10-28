@@ -22,9 +22,7 @@ public class EstimatesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Estimate>>> GetEstimates([FromQuery] Guid? clientId)
     {
-        var query = _context.Estimates
-            .Include(e => e.Client)
-            .AsQueryable();
+        var query = _context.Estimates.AsQueryable();
 
         if (clientId.HasValue)
         {
