@@ -45,7 +45,7 @@ ConstructionEstimation/
 
 ### Prerequisites
 
-- [.NET 8.0 SDK](https://dotnet.microsoft.com/download) or later
+- [.NET 9.0 SDK](https://dotnet.microsoft.com/download) or later
 
 ### Installation
 
@@ -328,7 +328,7 @@ code %APPDATA%\Claude\claude_desktop_config.json
 
 ### Available MCP Tools
 
-The MCP server exposes 8 tools for AI interaction:
+The MCP server exposes 10 tools for AI interaction:
 
 #### Client Management
 
@@ -340,12 +340,17 @@ The MCP server exposes 8 tools for AI interaction:
 - **list_estimates** - Get all estimates with optional client filter
 - **get_estimate_details** - Get detailed estimate information
 - **create_estimate** - Create a new estimate for a client
+- **update_estimate** - Update an existing estimate (title, description, amount, status, validUntil)
 - **get_estimate_statistics** - Get statistics about estimates
 
 #### Invoice & Financial
 
 - **list_invoices** - Get all invoices with optional filters
 - **get_client_financial_summary** - Get comprehensive financial summary
+
+#### Schema & Development
+
+- **get_database_schema** - Get complete database schema in OpenAPI/JSON Schema format for front-end development
 
 ### Example AI Queries
 
@@ -354,8 +359,10 @@ Once configured, you can ask Claude questions like:
 - "Show me all clients in the system"
 - "What's the financial summary for Smith Residence?"
 - "Create an estimate for Martinez Family Home for a deck renovation worth $15,000"
+- "Update estimate EST-2025-001 to change the status to Approved and increase the amount to $28,000"
 - "What are the statistics on all my estimates?"
 - "Show me all unpaid invoices"
+- "Get the database schema so I can build a front-end UI"
 
 ### Running the MCP Server Standalone
 
