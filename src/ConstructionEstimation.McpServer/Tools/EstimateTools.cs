@@ -193,6 +193,98 @@ public class EstimateTools
         }
     }
 
+    public async Task<string> UpdateEstimate(
+        string estimateIdStr,
+        string? title = null,
+        string? description = null,
+        string? totalAmountStr = null,
+        string? status = null,
+        string? validUntilStr = null)
+    {
+        try
+        {
+            if (!Guid.TryParse(estimateIdStr, out var estimateId))
+            {
+                return JsonSerializer.Serialize(new { error = "Invalid estimate ID format" });
+            }
+
+            // Find the estimate
+            var estimate = await _context.Estimates.FindAsync(estimateId);
+            if (estimate == null)
+            {
+                return JsonSerializer.Serialize(new { error = "Estimate not found" });
+            }
+
+            // Update only provided fields
+            if (!string.IsNullOrEmpty(title))
+            {
+                estimate.Title = title;
+            }
+
+            if (!string.IsNullOrEmpty(description))
+            {
+                estimate.Description = description;
+            }
+
+            if (!string.IsNullOrEmpty(totalAmountStr))
+            {
+                if (!decimal.TryParse(totalAmountStr, out var totalAmount))
+                {
+                    return JsonSerializer.Serialize(new { error = "Invalid total amount format" });
+                }
+                estimate.TotalAmount = totalAmount;
+            }
+
+            if (!string.IsNullOrEmpty(status))
+            {
+                if (!Enum.TryParse<EstimateStatus>(status, true, out var estimateStatus))
+                {
+                    return JsonSerializer.Serialize(new { error = $"Invalid status. Valid values are: {string.Join(", ", Enum.GetNames<EstimateStatus>())}" });
+                }
+                estimate.Status = estimateStatus;
+            }
+
+            if (!string.IsNullOrEmpty(validUntilStr))
+            {
+                if (!DateTime.TryParse(validUntilStr, out var validUntil))
+                {
+                    return JsonSerializer.Serialize(new { error = "Invalid validUntil date format" });
+                }
+                estimate.ValidUntil = validUntil;
+            }
+
+            // Update the timestamp
+            estimate.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            var result = new
+            {
+                success = true,
+                message = "Estimate updated successfully",
+                estimate = new
+                {
+                    estimate.Id,
+                    estimate.EstimateNumber,
+                    estimate.Title,
+                    estimate.Description,
+                    estimate.TotalAmount,
+                    Status = estimate.Status.ToString(),
+                    estimate.ValidUntil,
+                    estimate.CreatedAt,
+                    estimate.UpdatedAt
+                }
+            };
+
+            return JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error in UpdateEstimate: {ex.Message}");
+            return JsonSerializer.Serialize(new { error = "Failed to update estimate", details = ex.Message });
+        }
+    }
+
     public async Task<string> GetEstimateStatistics()
     {
         try

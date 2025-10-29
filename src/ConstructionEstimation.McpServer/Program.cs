@@ -28,10 +28,15 @@ try
     services.AddDbContext<AppDbContext>(options =>
         options.UseSqlite(connectionString));
 
+    // Register HttpClient for API calls
+    services.AddHttpClient();
+    
     // Register tool classes
     services.AddScoped<ClientTools>();
     services.AddScoped<EstimateTools>();
     services.AddScoped<InvoiceTools>();
+    services.AddScoped<SchemaTools>();
+    services.AddScoped<ApiTools>();
 
     var serviceProvider = services.BuildServiceProvider();
 
@@ -345,6 +350,69 @@ JsonNode HandleToolsList(JsonNode? id)
                 },
                 ["required"] = new JsonArray { "client_id" }
             }
+        },
+        new JsonObject
+        {
+            ["name"] = "update_estimate",
+            ["description"] = "Update an existing estimate (title, description, totalAmount, status, validUntil)",
+            ["inputSchema"] = new JsonObject
+            {
+                ["type"] = "object",
+                ["properties"] = new JsonObject
+                {
+                    ["estimate_id"] = new JsonObject
+                    {
+                        ["type"] = "string",
+                        ["description"] = "The GUID of the estimate to update"
+                    },
+                    ["title"] = new JsonObject
+                    {
+                        ["type"] = "string",
+                        ["description"] = "Optional: New title for the estimate"
+                    },
+                    ["description"] = new JsonObject
+                    {
+                        ["type"] = "string",
+                        ["description"] = "Optional: New description"
+                    },
+                    ["total_amount"] = new JsonObject
+                    {
+                        ["type"] = "string",
+                        ["description"] = "Optional: New total amount in decimal format"
+                    },
+                    ["status"] = new JsonObject
+                    {
+                        ["type"] = "string",
+                        ["description"] = "Optional: New status (Draft, Sent, Approved, or Rejected)"
+                    },
+                    ["valid_until"] = new JsonObject
+                    {
+                        ["type"] = "string",
+                        ["description"] = "Optional: New valid until date (ISO 8601 format)"
+                    }
+                },
+                ["required"] = new JsonArray { "estimate_id" }
+            }
+        },
+        new JsonObject
+        {
+            ["name"] = "get_database_schema",
+            ["description"] = "Get the complete database schema in OpenAPI/JSON Schema format for front-end development",
+            ["inputSchema"] = new JsonObject
+            {
+                ["type"] = "object",
+                ["properties"] = new JsonObject()
+            }
+        },
+        new JsonObject
+        {
+            ["name"] = "get_api_routes",
+            ["description"] = "Get the complete REST API routes from the live Swagger endpoint with full request/response models",
+            ["inputSchema"] = new JsonObject
+            {
+                ["type"] = "object",
+                ["properties"] = new JsonObject()
+            }
         }
     };
 
@@ -421,6 +489,27 @@ async Task<JsonNode> HandleToolCall(JsonNode? id, JsonNode? paramsNode, IService
                 invoiceTools = scope.ServiceProvider.GetRequiredService<InvoiceTools>();
                 var summaryClientId = arguments?["client_id"]?.GetValue<string>() ?? "";
                 result = await invoiceTools.GetClientFinancialSummary(summaryClientId);
+                break;
+
+            case "update_estimate":
+                estimateTools = scope.ServiceProvider.GetRequiredService<EstimateTools>();
+                var updateEstimateId = arguments?["estimate_id"]?.GetValue<string>() ?? "";
+                var updateTitle = arguments?["title"]?.GetValue<string>();
+                var updateDescription = arguments?["description"]?.GetValue<string>();
+                var updateTotalAmount = arguments?["total_amount"]?.GetValue<string>();
+                var updateStatus = arguments?["status"]?.GetValue<string>();
+                var updateValidUntil = arguments?["valid_until"]?.GetValue<string>();
+                result = await estimateTools.UpdateEstimate(updateEstimateId, updateTitle, updateDescription, updateTotalAmount, updateStatus, updateValidUntil);
+                break;
+
+            case "get_database_schema":
+                var schemaTools = scope.ServiceProvider.GetRequiredService<SchemaTools>();
+                result = await schemaTools.GetDatabaseSchema();
+                break;
+
+            case "get_api_routes":
+                var apiTools = scope.ServiceProvider.GetRequiredService<ApiTools>();
+                result = await apiTools.GetApiRoutes();
                 break;
 
             default:
