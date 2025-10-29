@@ -328,7 +328,7 @@ code %APPDATA%\Claude\claude_desktop_config.json
 
 ### Available MCP Tools
 
-The MCP server exposes 10 tools for AI interaction:
+The MCP server exposes 11 tools for AI interaction:
 
 #### Client Management
 
@@ -351,6 +351,7 @@ The MCP server exposes 10 tools for AI interaction:
 #### Schema & Development
 
 - **get_database_schema** - Get complete database schema in OpenAPI/JSON Schema format for front-end development
+- **get_api_routes** - Get complete REST API routes from live Swagger endpoint with full request/response models (API must be running)
 
 ### Example AI Queries
 
@@ -363,6 +364,8 @@ Once configured, you can ask Claude questions like:
 - "What are the statistics on all my estimates?"
 - "Show me all unpaid invoices"
 - "Get the database schema so I can build a front-end UI"
+- "Get the API routes so I can build a front-end app"
+- "Show me all the available REST endpoints with their request and response formats"
 
 ### Running the MCP Server Standalone
 

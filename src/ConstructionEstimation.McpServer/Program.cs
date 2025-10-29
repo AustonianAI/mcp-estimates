@@ -28,11 +28,15 @@ try
     services.AddDbContext<AppDbContext>(options =>
         options.UseSqlite(connectionString));
 
+    // Register HttpClient for API calls
+    services.AddHttpClient();
+    
     // Register tool classes
     services.AddScoped<ClientTools>();
     services.AddScoped<EstimateTools>();
     services.AddScoped<InvoiceTools>();
     services.AddScoped<SchemaTools>();
+    services.AddScoped<ApiTools>();
 
     var serviceProvider = services.BuildServiceProvider();
 
@@ -399,6 +403,16 @@ JsonNode HandleToolsList(JsonNode? id)
                 ["type"] = "object",
                 ["properties"] = new JsonObject()
             }
+        },
+        new JsonObject
+        {
+            ["name"] = "get_api_routes",
+            ["description"] = "Get the complete REST API routes from the live Swagger endpoint with full request/response models",
+            ["inputSchema"] = new JsonObject
+            {
+                ["type"] = "object",
+                ["properties"] = new JsonObject()
+            }
         }
     };
 
@@ -491,6 +505,11 @@ async Task<JsonNode> HandleToolCall(JsonNode? id, JsonNode? paramsNode, IService
             case "get_database_schema":
                 var schemaTools = scope.ServiceProvider.GetRequiredService<SchemaTools>();
                 result = await schemaTools.GetDatabaseSchema();
+                break;
+
+            case "get_api_routes":
+                var apiTools = scope.ServiceProvider.GetRequiredService<ApiTools>();
+                result = await apiTools.GetApiRoutes();
                 break;
 
             default:
